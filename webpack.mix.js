@@ -12,4 +12,5 @@ const mix = require('laravel-mix');
  */
 
 mix.js('resources/js/app.js', 'public/js')
+    .js('resources/js/front.js', 'public/js') // aggiungo il file <front.js> a quelli da compilare (perché contiene codice in Vue): il file compilato si troverà in <\public\js> con lo stesso nome, ma in js plain.
     .sass('resources/sass/app.scss', 'public/css');
