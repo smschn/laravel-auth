@@ -15,10 +15,6 @@ use Illuminate\Support\Facades\Auth; // aggiunto per non visualizzare errore in 
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
-
 Auth::routes();
 
 // si raggruppano tutte le routes relative alla parte amministrativa del sito attuando un filtraggio a monte, tra tutte le route esistenti:
@@ -30,6 +26,7 @@ Route::middleware('auth') // controlla se il visitatore ha l'autorizzazione per 
     ->prefix('admin') // cerca solo le routes che hanno nella parte iniziale dell'url\URI: </admin>.
     ->group(function() { // raggruppa tutte le route che soddisfano le condizioni precedenti.
         Route::get('/', 'HomeController@Index')->name('home');  // questa route lega l'url <localhost:8000/admin> alla view <\views\admin\home.blade.php> e si chiama <admin.home> (in automatico viene aggiunto il prefisso 'admin').
+        Route::resource('posts', 'PostController'); // route specifica per gestire in automatico le operazioni CRUD sui post: si trova tra quelle amministrative perché solo chi è loggato può gestire i post.
     });
 
 // la seguente route va inserita per ultima in questo file.
