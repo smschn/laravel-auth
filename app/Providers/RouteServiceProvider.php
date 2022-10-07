@@ -21,7 +21,7 @@ class RouteServiceProvider extends ServiceProvider
      *
      * @var string
      */
-    public const HOME = '/admin'; // gli utenti loggati vengono reindirizzati alla route /admin.
+    public const HOME = '/admin'; // gli utenti loggati vengono reindirizzati all'url '/admin' che carica la view '\admin\home.blade.php'.
 
     /**
      * Define your route model bindings, pattern filters, etc.

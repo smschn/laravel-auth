@@ -27,7 +27,7 @@ Auth::routes();
 Route::middleware('auth') // controlla se si ha l'autorizzazione per proseguire, accedendo a queste routes (l'autorizzazione c'è dopo aver eseguito il login, viceversa non c'è).
     ->namespace('Admin') // cerca i controller solo nella cartella 'Admin' dei controller: \app\http\controllers\ADMIN.
     ->name('admin.') // cerca solo le routes i cui nomi iniziano con 'admin.'.
-    ->prefix('admin') // cerca solo le routes che hanno nella parte iniziale dell'url '/admin'
-    ->group(function () { // raggruppa tutte le route che soddisfano le condizioni precedenti
-        Route::get('/', 'HomeController@Index')->name('home');  //
+    ->prefix('admin') // cerca solo le routes che hanno nella parte iniziale dell'url </admin>.
+    ->group(function () { // raggruppa tutte le route che soddisfano le condizioni precedenti.
+        Route::get('/', 'HomeController@Index')->name('home');  // questa route lega l'url <localhost:8000/admin> alla view <\views\admin\home.blade.php> e si chiama <admin.home> (in automatico viene aggiunto il prefisso ).
     });
