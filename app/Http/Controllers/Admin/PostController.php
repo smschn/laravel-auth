@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
 use App\Post; // importo il model post per poterlo usare in questo file.
+use Illuminate\Support\Str; // importo questa classe per poterla usare nella creazione dello <slug>.
 
 class PostController extends Controller
 {
@@ -28,7 +29,7 @@ class PostController extends Controller
      */
     public function create()
     {
-        //
+        return view('admin.posts.create');
     }
 
     /**
@@ -39,7 +40,32 @@ class PostController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $request->validate(
+            [
+                'title' => 'required|max:255',
+                'content' => 'required|max:65535'
+            ]
+        );
+
+        $data = $request->all();
+
+        $slug = Str::slug($data['title'], '-');
+
+        $checkOtherSlugs = Post::where('slug', $slug)->first();
+
+        $counter = 1;
+
+        while($checkOtherSlugs) {
+            $slug = Str::slug($data['title'] . '-' . $counter, '-');
+            $counter++;
+            $checkOtherSlugs = Post::where('slug', $slug)->first();
+        }
+
+        $data['slug'] = $slug;
+        $newPost = new Post();
+        $newPost->fill($data);
+        $newPost->save();
+        return redirect()->route('admin.posts.index');
     }
 
     /**
@@ -48,9 +74,9 @@ class PostController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show(Post $post) // utilizzo la dependency injection al posto di: <public function show($id)> + metodo <::find()>.
     {
-        //
+        return view('admin.posts.show', compact('post'));
     }
 
     /**
