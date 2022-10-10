@@ -114,18 +114,18 @@ class PostController extends Controller
         return redirect()->route('admin.posts.index');
     }
 
-    // creo una funzione per calcolare lo slug, al fine di non ripetere il codice sia nella store() sia nella create().
+    // creo una funzione per calcolare lo slug, al fine di non ripetere il codice sia nella store() sia nella update().
     protected function createSlug($titleP) {
         // per evitare problemi di nomenclatura con lo slug (che deve essere UNIQUE - vedere migration), serve implementare quanto scritto sotto.
         $newSlug = Str::slug($titleP, '-'); // creo lo slug partendo dal titolo.
-        $checkOtherSlugs = Post::where('slug', $newSlug)->first(); // assegno il primo slug che abbia come valore $newSlug (se esiste, altrimenti è NULL).
+        $checkPosts = Post::where('slug', $newSlug)->first(); // cerco nella tabella <posts> nel database se lo slug appena creato esiste e lo assegno (se non esiste, la variabile è NULL).
         $counter = 1; // imposto un contatore
-        while ($checkOtherSlugs) { // se esiste già lo slug, entro nel ciclo per crearne uno nuovo; altrimenti passo direttamente alla return.
-            $newSlug = Str::slug($titleP . '-' . $counter, '-'); // creo dinamicamente un nuovo slug aggiungendo il contatore alla fine del nome.
+        while ($checkPosts) { // se lo slug esiste già, entro nel ciclo per crearne uno nuovo; altrimenti passo direttamente alla return.
+            $newSlug = Str::slug($titleP . '-' . $counter, '-'); // creo dinamicamente un nuovo slug aggiungendo il contatore alla fine.
             $counter++; // incremento il contatore.
-            // per uscire dal ciclo, cerco nel database se esiste già uno slug con il nome appena creato:
+            // per uscire dal ciclo, cerco nella tabella <posts> nel database se esiste già uno slug con il nome appena creato:
             // se esiste, torno nel ciclo (creando un nuovo slug), altrimenti esco dal ciclo (perché il nuovo slug dinamico non viene trovato nel database).
-            $checkOtherSlugs = Post::where('slug', $newSlug)->first();
+            $checkPosts = Post::where('slug', $newSlug)->first();
         }
         return $newSlug;
     }
