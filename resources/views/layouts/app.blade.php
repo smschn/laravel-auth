@@ -75,13 +75,27 @@
             </div>
         </nav>
 
+        {{-- container per messaggi --}}
         <div class="container mt-4">
-            {{-- flashed session data: conferma avvenuta creazione \ modifica del post --}}
+
+            {{-- flashed session data: mostra una conferma di avvenuta creazione \ modifica del post --}}
             @if (session('status'))
                 <div class="alert alert-success">
                     {{ session('status') }}
                 </div>
             @endif
+
+            {{-- validation error --}}
+            @if ($errors->any())
+                <div class="alert alert-danger">
+                    <ul>
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
+            
         </div>
 
         <main class="py-4">

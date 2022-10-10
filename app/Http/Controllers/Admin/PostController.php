@@ -42,8 +42,8 @@ class PostController extends Controller
     {
         $request->validate(
             [
-                'title' => 'required|max:255',
-                'content' => 'required|max:65535'
+                'title' => 'required|max:255|min:5',
+                'content' => 'required|max:65535|min:5'
             ]
         );
         $data = $request->all();
@@ -88,8 +88,8 @@ class PostController extends Controller
     {
         $request->validate(
             [
-                'title' => 'required|max:255',
-                'content' => 'required|max:65535'
+                'title' => 'required|max:255|min:5',
+                'content' => 'required|max:65535|min:5'
             ]
         );
         $data = $request->all();
