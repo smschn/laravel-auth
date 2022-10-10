@@ -111,7 +111,7 @@ class PostController extends Controller
     public function destroy(Post $post) // utilizzo la dependency injection.
     {
         $post->delete();
-        return redirect()->route('admin.posts.index');
+        return redirect()->route('admin.posts.index')->with('status', 'Post deleted!'); // aggiunto messaggio di avvenuta cancellazione.
     }
 
     // creo una funzione per calcolare lo slug, al fine di non ripetere il codice sia nella store() sia nella update().
