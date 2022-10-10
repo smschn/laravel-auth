@@ -47,24 +47,10 @@ class PostController extends Controller
             ]
         );
         $data = $request->all();
-
-        // inizio parte slug.
-        // per evitare problemi di nomenclatura con lo slug, serve implementare quanto scritto sotto.
-        $slug = Str::slug($data['title'], '-'); // creo lo slug
-        $checkOtherSlugs = Post::where('slug', $slug)->first(); // ritorno il primo slug che abbia come valore $slug
-        $counter = 1; // imposto un contatore
-        while ($checkOtherSlugs) { // se esiste già lo slug, entro nel ciclo per crearne uno nuovo dinamicamente, aggiungendo un numero a fine slug.
-            $slug = Str::slug($data['title'] . '-' . $counter, '-');
-            $counter++;
-            $checkOtherSlugs = Post::where('slug', $slug)->first();
-            // per uscire dal ciclo, cerco nel database se esiste già uno slug con il nome appena creato:
-            // se esiste, torno nel ciclo e ne creo uno nuovo, altrimenti esco dal ciclo (perché il nuovo $checkOtherSlugs non viene trovato).
-        }
-        $data['slug'] = $slug; // aggiungo il campo la proprietà <slug> a $data e le assegno lo $slug
-        // fine parte slug.
-
         $newPost = new Post();
         $newPost->fill($data);
+        $newSlug = $this->createSlug($newPost->title); // ricorda: usare $this-> dentro le classi; creo un nuovo slug richiamando la funzione.
+        $newPost->slug = $newSlug; // assegno il nuovo slug al nuovo post.
         $newPost->save();
         return redirect()->route('admin.posts.index');
     }
@@ -75,7 +61,7 @@ class PostController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show(Post $post) // utilizzo la dependency injection al posto di: <public function show($id)> + metodo <::find()>.
+    public function show(Post $post) // utilizzo la dependency injection (Post $post) invece di: <public function show($id)> + metodo <::find()>.
     {
         return view('admin.posts.show', compact('post'));
     }
@@ -86,9 +72,9 @@ class PostController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit($id)
+    public function edit(Post $post) // utilizzo la dependency injection.
     {
-        //
+        return view('admin.posts.edit', compact('post'));
     }
 
     /**
@@ -98,9 +84,22 @@ class PostController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, Post $post) // utilizzo la dependency injection.
     {
-        //
+        $request->validate(
+            [
+                'title' => 'required|max:255',
+                'content' => 'required|max:65535'
+            ]
+        );
+        $data = $request->all();
+        
+        // se il titolo è stato modificato, devo creare un nuovo slug relativo al nuovo titolo.
+        if ($post->title !== $data['title']) {
+            $data['slug'] = $this->createSlug($data['title']); // assegno il nuovo slug creato a $data, aggiungedone all'array associativo la chiave 'slug' con il relativo valore appena creato.
+        }
+        $post->update($data); // usando l'update() non c'è bisogno di usare anche il metodo ->save() perché viene fatto in automatico.
+        return redirect()->route('admin.posts.index');
     }
 
     /**
@@ -109,8 +108,25 @@ class PostController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(Post $post) // utilizzo la dependency injection.
     {
-        //
+        $post->delete();
+        return redirect()->route('admin.posts.index');
+    }
+
+    // creo una funzione per calcolare lo slug, al fine di non ripetere il codice sia nella store() sia nella create().
+    protected function createSlug($titleP) {
+        // per evitare problemi di nomenclatura con lo slug (che deve essere UNIQUE - vedere migration), serve implementare quanto scritto sotto.
+        $newSlug = Str::slug($titleP, '-'); // creo lo slug partendo dal titolo.
+        $checkOtherSlugs = Post::where('slug', $newSlug)->first(); // assegno il primo slug che abbia come valore $newSlug (se esiste, altrimenti è NULL).
+        $counter = 1; // imposto un contatore
+        while ($checkOtherSlugs) { // se esiste già lo slug, entro nel ciclo per crearne uno nuovo; altrimenti passo direttamente alla return.
+            $newSlug = Str::slug($titleP . '-' . $counter, '-'); // creo dinamicamente un nuovo slug aggiungendo il contatore alla fine del nome.
+            $counter++; // incremento il contatore.
+            // per uscire dal ciclo, cerco nel database se esiste già uno slug con il nome appena creato:
+            // se esiste, torno nel ciclo (creando un nuovo slug), altrimenti esco dal ciclo (perché il nuovo slug dinamico non viene trovato nel database).
+            $checkOtherSlugs = Post::where('slug', $newSlug)->first();
+        }
+        return $newSlug;
     }
 }
