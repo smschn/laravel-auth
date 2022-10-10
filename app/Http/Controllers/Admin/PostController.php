@@ -52,7 +52,7 @@ class PostController extends Controller
         $newSlug = $this->createSlug($newPost->title); // ricorda: usare $this-> dentro le classi; creo un nuovo slug richiamando la funzione.
         $newPost->slug = $newSlug; // assegno il nuovo slug al nuovo post.
         $newPost->save();
-        return redirect()->route('admin.posts.index');
+        return redirect()->route('admin.posts.index')->with('status', 'Post created!'); // aggiunto messaggio di avvenuta creazione.
     }
 
     /**
@@ -99,7 +99,7 @@ class PostController extends Controller
             $data['slug'] = $this->createSlug($data['title']); // assegno il nuovo slug creato a $data, aggiungedone all'array associativo la chiave 'slug' con il relativo valore appena creato.
         }
         $post->update($data); // usando l'update() non c'è bisogno di usare anche il metodo ->save() perché viene fatto in automatico.
-        return redirect()->route('admin.posts.index');
+        return redirect()->route('admin.posts.index')->with('status', 'Post updated!'); // aggiunto messaggio di avvenuta modifica.
     }
 
     /**

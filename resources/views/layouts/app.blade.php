@@ -75,6 +75,15 @@
             </div>
         </nav>
 
+        <div class="container mt-4">
+            {{-- flashed session data: conferma avvenuta creazione \ modifica del post --}}
+            @if (session('status'))
+                <div class="alert alert-success">
+                    {{ session('status') }}
+                </div>
+            @endif
+        </div>
+
         <main class="py-4">
             @yield('content')
         </main>
