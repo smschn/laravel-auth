@@ -46,22 +46,23 @@ class PostController extends Controller
                 'content' => 'required|max:65535'
             ]
         );
-
         $data = $request->all();
 
-        $slug = Str::slug($data['title'], '-');
-
-        $checkOtherSlugs = Post::where('slug', $slug)->first();
-
-        $counter = 1;
-
-        while($checkOtherSlugs) {
+        // inizio parte slug.
+        // per evitare problemi di nomenclatura con lo slug, serve implementare quanto scritto sotto.
+        $slug = Str::slug($data['title'], '-'); // creo lo slug
+        $checkOtherSlugs = Post::where('slug', $slug)->first(); // ritorno il primo slug che abbia come valore $slug
+        $counter = 1; // imposto un contatore
+        while ($checkOtherSlugs) { // se esiste già lo slug, entro nel ciclo per crearne uno nuovo dinamicamente, aggiungendo un numero a fine slug.
             $slug = Str::slug($data['title'] . '-' . $counter, '-');
             $counter++;
             $checkOtherSlugs = Post::where('slug', $slug)->first();
+            // per uscire dal ciclo, cerco nel database se esiste già uno slug con il nome appena creato:
+            // se esiste, torno nel ciclo e ne creo uno nuovo, altrimenti esco dal ciclo (perché il nuovo $checkOtherSlugs non viene trovato).
         }
+        $data['slug'] = $slug; // aggiungo il campo la proprietà <slug> a $data e le assegno lo $slug
+        // fine parte slug.
 
-        $data['slug'] = $slug;
         $newPost = new Post();
         $newPost->fill($data);
         $newPost->save();
